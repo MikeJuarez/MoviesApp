@@ -20,6 +20,8 @@ import michael_juarez.popularmoviesapp.data.MoviesHelper;
 import michael_juarez.popularmoviesapp.utilities.NetworkUtils;
 
 /**
+ * Created by Michael Juarez on 7/10/2017.
+ *
  * Allow the user to tap on a movie poster and transition to a details screen with additional information such as:
     - original title
     - movie poster image thumbnail
@@ -27,6 +29,8 @@ import michael_juarez.popularmoviesapp.utilities.NetworkUtils;
     - user rating (called vote_average in the api)
     - release date
  */
+
+
 
 public class MovieDetails extends AppCompatActivity{
     private static final String EXTRA_TITLE = "com.michael_juarez.popularmoviesapp.title";

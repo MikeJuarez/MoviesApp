@@ -13,7 +13,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import java.net.URL;
 import java.util.ArrayList;
@@ -23,12 +22,13 @@ import michael_juarez.popularmoviesapp.data.MoviesHelper;
 import michael_juarez.popularmoviesapp.utilities.NetworkUtils;
 import michael_juarez.popularmoviesapp.utilities.OpenMoviesJsonUtils;
 
-import static android.accounts.AccountManager.KEY_PASSWORD;
+/**
+ *  Created by Michael Juarez on 7/10/2017.
+ */
 
 public class PopularMovies extends AppCompatActivity {
     private final String startingPageNumber = "1";
 
-    //Picasso.with(this).load("http://i.imgur.com/DvpvklR.png").into(full_page);
     private RecyclerView mRecyclerView;
     private MoviesAdapter mAdapter;
     private GridLayoutManager layoutManager;
@@ -37,7 +37,6 @@ public class PopularMovies extends AppCompatActivity {
     private MoviesHelper moviesHelper;
     private String filterType;
 
-    //savedInstanceTstate
     private final static String KEY_TYPE = "com.popularmoviesapp.michael_juarez/key_type";
 
     @Override

@@ -4,7 +4,7 @@ import static android.R.attr.id;
 import static michael_juarez.popularmoviesapp.R.id.poster_path;
 
 /**
- * Created by user on 7/10/2017.
+ * Created by Michael Juarez on 7/10/2017.
  */
 
 public class Movie {

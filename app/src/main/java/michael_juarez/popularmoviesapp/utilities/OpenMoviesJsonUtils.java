@@ -18,7 +18,7 @@ import static android.R.attr.name;
 import static android.os.Build.VERSION_CODES.M;
 
 /**
- * Created by user on 7/10/2017.
+ * Created by Michael Juarez on 7/10/2017.
  */
 
 public final class OpenMoviesJsonUtils {

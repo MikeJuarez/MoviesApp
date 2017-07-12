@@ -11,7 +11,7 @@ import michael_juarez.popularmoviesapp.utilities.NetworkUtils;
 import michael_juarez.popularmoviesapp.utilities.OpenMoviesJsonUtils;
 
 /**
- * Created by user on 7/11/2017.
+ * Created by Michael Juarez on 7/10/2017.
  */
 
 public class MoviesHelper {

@@ -19,7 +19,7 @@ import michael_juarez.popularmoviesapp.utilities.NetworkUtils;
 import static android.R.attr.start;
 
 /**
- * Created by user on 7/10/2017.
+ *  Created by Michael Juarez on 7/10/2017.
  */
 
 public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdapterViewHolder> {
