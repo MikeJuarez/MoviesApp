@@ -1,0 +1,8 @@
+<resources>
+    <string name="app_name">Movie App (Stage One)</string>
+    <string name="error_message">An error has occured after attempting to load movie list.</string>
+    <string name="description">Overview:</string>
+    <string name="vote_average">Vote Average:</string>
+    <string name="release_date">Release Date:</string>
+    <string name="back">Back</string>
+</resources>
