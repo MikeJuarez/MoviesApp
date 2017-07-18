@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="michael_juarez.popularmoviesapp.PopularMovies">
+    tools:context="michael_juarez.popularmoviesapp.MoviesActivity">
     <android.support.v7.widget.RecyclerView
         android:id="@+id/rv_movies"
         android:layout_width="match_parent"

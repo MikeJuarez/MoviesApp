@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+      android:orientation="vertical"
+      android:layout_width="225dp"
+      android:layout_height="match_parent"
+      android:layout_margin="10dp">
+            <ImageView
+                android:id="@+id/movie_details_list_item_iv"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:scaleType="fitXY"
+                android:adjustViewBounds="true"/>
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="25dp"
+                    android:background="@drawable/gradient"
+                    android:layout_alignBottom="@id/movie_details_list_item_iv"
+                    android:layout_alignLeft="@id/movie_details_list_item_iv"/>
+                <TextView
+                    android:id="@+id/movie_details_list_item_tv"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="monospace"
+                    android:textColor="@android:color/white"
+                    android:layout_alignBottom="@id/movie_details_list_item_iv"
+                    android:layout_alignLeft="@id/movie_details_list_item_iv"
+                    android:paddingBottom="1dp"
+                    android:paddingLeft="3dp"/>
+
+</RelativeLayout>

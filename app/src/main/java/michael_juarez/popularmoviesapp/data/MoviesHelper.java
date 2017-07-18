@@ -2,13 +2,8 @@ package michael_juarez.popularmoviesapp.data;
 
 import android.content.Context;
 
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
-
-import michael_juarez.popularmoviesapp.PopularMovies;
-import michael_juarez.popularmoviesapp.utilities.NetworkUtils;
-import michael_juarez.popularmoviesapp.utilities.OpenMoviesJsonUtils;
 
 /**
  * Created by Michael Juarez on 7/10/2017.
@@ -32,19 +27,6 @@ public class MoviesHelper {
 
     public List<Movie> getMovieList() {
         return mMovieList;
-    }
-
-    public int getPageNumberInt(String pageNumber) {
-        return Integer.parseInt(pageNumber);
-    }
-
-
-    public int getMoviesListSize() {
-        return mMovieList.size();
-    }
-
-    public void addMovie(Movie movie) {
-        mMovieList.add(movie);
     }
 
     public void addMoreMovies(ArrayList<Movie> movieList) {

@@ -5,4 +5,9 @@
     <string name="vote_average">Vote Average:</string>
     <string name="release_date">Release Date:</string>
     <string name="back">Back</string>
+    <string name="trailers">Trailers:</string>
+    <string name="play_trailer">Play Trailer&#160;</string>
+    <string name="reviews">Reviews:</string>
+    <string name="menu_favorite">Favorite</string>
+
 </resources>

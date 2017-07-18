@@ -7,13 +7,13 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 
 import michael_juarez.popularmoviesapp.data.Movie;
-import michael_juarez.popularmoviesapp.data.MoviesHelper;
 import michael_juarez.popularmoviesapp.utilities.NetworkUtils;
 
 import static android.R.attr.start;
@@ -28,7 +28,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
 
     private ArrayList<Movie> movieList;
 
-    public  interface ScrollMaxListener {
+    public interface ScrollMaxListener {
         void reloadList(String pageNumber);
     }
 

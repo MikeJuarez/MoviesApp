@@ -1,5 +1,7 @@
 package michael_juarez.popularmoviesapp.data;
 
+import java.util.ArrayList;
+
 import static android.R.attr.id;
 import static michael_juarez.popularmoviesapp.R.id.poster_path;
 
@@ -89,4 +91,6 @@ public class Movie {
     public void setVoteAverage(String voteAverage) {
         mVoteAverage = voteAverage;
     }
+
+
 }

@@ -37,12 +37,14 @@
         </RelativeLayout>
 
         <LinearLayout
+            android:background="@drawable/card"
+            android:baselineAligned="false"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:weightSum="10"
-            android:layout_marginLeft="16dp"
-            android:layout_marginRight="16dp">
+            android:paddingLeft="15dp"
+            android:paddingRight="15dp">
 
             <LinearLayout
                 android:layout_width="0dp"
@@ -109,9 +111,50 @@
                     android:textStyle="italic"
                     android:paddingBottom="16dp"/>
 
+
             </LinearLayout>
         </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:paddingBottom="16dp"
+            android:paddingTop="16dp"
+            android:background="@color/mikesgray">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/trailers"
+                style="@style/TextStyleMovieDetailsWhite"
+                android:textStyle="bold"
+                android:textSize="18sp"/>
+            <android.support.v7.widget.RecyclerView
+                android:id="@+id/movie_details_trailers_rv"
+                android:layout_width="match_parent"
+                android:layout_height="150dp"/>
+        </LinearLayout>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingLeft="17dp"
+            android:paddingRight="17dp"
+            android:orientation="vertical"
+            android:background="@drawable/card">
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="@string/reviews"
+                style="@style/TextStyleMovieDetails"
+                android:textStyle="bold"
+                android:textSize="18sp"/>
+            <TextView
+                android:id="@+id/movie_details_reviews_tv"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="16sp"
+                style="@style/TextStyleMovieDetails"/>
+        </LinearLayout>
     </LinearLayout>
-
-
 </ScrollView>

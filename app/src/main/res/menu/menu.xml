@@ -16,6 +16,10 @@
             android:title="Top-Rated Movies"
             android:orderInCategory="2"/>
 
+        <item
+            android:id="@+id/menu_sortby_favorites"
+            android:title="Favorite Movies"
+            android:orderInCategory="3"/>
     </item>
 
 </menu>
