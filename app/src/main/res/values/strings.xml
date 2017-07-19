@@ -9,5 +9,7 @@
     <string name="play_trailer">Play Trailer&#160;</string>
     <string name="reviews">Reviews:</string>
     <string name="menu_favorite">Favorite</string>
+    <string name="removed_successfully">was successfully removed from your Favorites List</string>
+    <string name="added_sucessfully">was successfully added to your Favorites List</string>
 
 </resources>

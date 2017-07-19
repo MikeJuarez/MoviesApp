@@ -52,8 +52,17 @@ public class FavoriteMoviesContentProvider extends ContentProvider{
                         null,
                         sortOrder);
                 break;
+            case FAVORITE_MOVIES_WITH_ID:
+                cursor = db.query(TABLE_NAME,
+                        projection,
+                        selection,
+                        selectionArgs,
+                        null,
+                        null,
+                        sortOrder);
+                break;
             default:
-                throw new UnsupportedOperationException("Unkown uri: " + uri);
+                throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
 
         cursor.setNotificationUri(getContext().getContentResolver(), uri);
@@ -94,25 +103,18 @@ public class FavoriteMoviesContentProvider extends ContentProvider{
     @Override
     public int delete(@NonNull Uri uri, @Nullable String selection, @Nullable String[] selectionArgs) {
         final SQLiteDatabase db = mFavoriteMoviesDbHelper.getWritableDatabase();
+
         int match = sUriMatcher.match(uri);
-        Uri returnUri;
-        long id;
+        int tasksDeleted;
         switch(match) {
             case FAVORITE_MOVIES_WITH_ID:
-                id = db.delete(FavoriteMoviesContract.FavoriteMovies.TABLE_NAME, selection, null);
-                if (id > 0) {
-                    //Success
-
-                } else {
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
-                }
+                String mId = uri.getPathSegments().get(1);
+                tasksDeleted = db.delete(TABLE_NAME, FavoriteMoviesContract.FavoriteMovies.COLUMN_MOVIE_ID + "=?", new String[]{mId});
                 break;
             default:
                 throw new UnsupportedOperationException("Unknown uri: " + uri);
         }
-        getContext().getContentResolver().notifyChange(uri, null);
-
-        return 0;
+        return tasksDeleted;
     }
 
     @Override
