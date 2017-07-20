@@ -1,5 +1,8 @@
 package michael_juarez.popularmoviesapp.utilities;
 
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 
 import java.io.IOException;
@@ -17,9 +20,11 @@ public final class NetworkUtils {
 
     private static final String TAG = NetworkUtils.class.getSimpleName();
 
-    private static final String API_KEY = "ENTER_API_KEY_HERE";
+    private static final String API_KEY = "ENTER_TMDB_API_KEY_HERE";
+
     private static final String POPULAR_MOVIES_BASE_URL = "http://api.themoviedb.org/3/movie/popular?api_key=";
     private static final String TOP_RATED_MOVIES_BASE_URL = "http://api.themoviedb.org/3/movie/top_rated?api_key=";
+
     private static final String TRAILER_AND_REVIEW_START_BASE_URL = "http://api.themoviedb.org/3/movie/";
     private static final String TRAILER_END_BASE_URL = "/videos?api_key=";
     private static final String REVIEW_END_BASE_URL = "/reviews?api_key=";
@@ -27,11 +32,12 @@ public final class NetworkUtils {
     private static final String YOUTUBE_BASE_URL = "http://www.youtube.com/watch?v=";
     private static final String YOUTUBE_APP_BASE_URL = "vnd.youtube://";
 
-    private static final String POSTER_DEFAULT_SIZE = "w500";
     private static final String POSTER_BASE_URL = "http://image.tmdb.org/t/p/";
+    private static final String POSTER_DEFAULT_SIZE = "w500";
 
     public static final String TYPE_POPULAR = "POPULAR";
     public static final String TYPE_TOP_RATED = "TOP RATED";
+    public static final String TYPE_FAVORITE_MOVIES = "FAVORITE MOVIES";
 
     public static URL getMoviesURL(String sortBy, String pageNumber) {
         String pre_url;

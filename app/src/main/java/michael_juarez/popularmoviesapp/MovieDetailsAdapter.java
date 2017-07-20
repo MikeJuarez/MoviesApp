@@ -1,9 +1,6 @@
 package michael_juarez.popularmoviesapp;
 
-import android.app.LauncherActivity;
-import android.content.Intent;
 import android.content.res.Resources;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -13,11 +10,7 @@ import android.widget.TextView;
 
 import com.squareup.picasso.Picasso;
 
-import java.net.URL;
 import java.util.ArrayList;
-
-import michael_juarez.popularmoviesapp.data.Movie;
-import michael_juarez.popularmoviesapp.data.Review;
 
 /**
  * Created by user on 7/16/2017.
@@ -27,11 +20,11 @@ public class MovieDetailsAdapter extends RecyclerView.Adapter<MovieDetailsAdapte
 
     private ArrayList<String> trailerList;
     final private ListItemClickListener mListItemClickListener;
-    private String posterPath;
+    private String backDropPath;
 
-    public MovieDetailsAdapter(ArrayList<String> trailers, String pathPoster, ListItemClickListener listItemClickListener) {
+    public MovieDetailsAdapter(ArrayList<String> trailers, String backDropPoster, ListItemClickListener listItemClickListener) {
         trailerList = trailers;
-        posterPath = pathPoster;
+        backDropPath = backDropPoster;
         mListItemClickListener = listItemClickListener;
     }
 
@@ -50,7 +43,7 @@ public class MovieDetailsAdapter extends RecyclerView.Adapter<MovieDetailsAdapte
     public void onBindViewHolder(MovieDetailsAdapterViewHolder holder, int position) {
         Resources resources = holder.itemView.getContext().getResources();
         holder.mTrailer.setText(resources.getString(R.string.play_trailer) + (position+1));
-        Picasso.with(holder.itemView.getContext()).load(posterPath).into(holder.mTrailerBG);
+        Picasso.with(holder.itemView.getContext()).load(backDropPath).into(holder.mTrailerBG);
     }
 
     @Override

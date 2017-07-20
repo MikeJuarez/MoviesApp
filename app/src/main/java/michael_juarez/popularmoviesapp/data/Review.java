@@ -2,6 +2,8 @@ package michael_juarez.popularmoviesapp.data;
 
 /**
  * Created by user on 7/17/2017.
+ * This class creates and stores Review Objects
+ * Reviews contain two variables, an author and their comment/review *
  */
 
 public class Review {

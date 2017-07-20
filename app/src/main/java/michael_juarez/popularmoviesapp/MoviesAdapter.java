@@ -3,6 +3,7 @@ package michael_juarez.popularmoviesapp;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,6 +18,7 @@ import michael_juarez.popularmoviesapp.data.Movie;
 import michael_juarez.popularmoviesapp.utilities.NetworkUtils;
 
 import static android.R.attr.start;
+import static android.content.ContentValues.TAG;
 
 /**
  *  Created by Michael Juarez on 7/10/2017.
@@ -55,9 +57,12 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
         String poster_path = movieList.get(position).getPoster_path();
         String poster_url = NetworkUtils.getImageURL(poster_path);
         Picasso.with(context).load(poster_url).into(holder.mPoster_path);
+        String pNumber = movieList.get(position).getPageNumber();
+        if (pNumber.equals("favorite_movies"))
+            return;
+        if (position >= movieList.size() - 1) {
+            int pageNumber = Integer.parseInt(pNumber);
 
-        if (position >= movieList.size() - 5) {
-            int pageNumber = Integer.parseInt(movieList.get(position).getPageNumber());
             pageNumber++;
             mScrollMaxListener.reloadList(Integer.toString(pageNumber));
         }
@@ -74,7 +79,7 @@ public class MoviesAdapter extends RecyclerView.Adapter<MoviesAdapter.MoviesAdap
     }
 
     public class MoviesAdapterViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
-        private final ImageView mPoster_path;
+        private ImageView mPoster_path;
 
         public MoviesAdapterViewHolder(View itemView) {
             super(itemView);

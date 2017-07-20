@@ -1,37 +1,29 @@
 package michael_juarez.popularmoviesapp;
 
 import android.content.ActivityNotFoundException;
-import android.content.ContentResolver;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
-import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
-import android.graphics.Path;
-import android.graphics.drawable.BitmapDrawable;
-import android.graphics.drawable.Drawable;
-import android.graphics.drawable.Icon;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.LoaderManager;
 import android.support.v4.content.AsyncTaskLoader;
 import android.support.v4.content.Loader;
-import android.support.v4.content.Loader.OnLoadCompleteListener;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.text.Spannable;
-import android.text.SpannableString;
-import android.text.SpannableStringBuilder;
-import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -39,16 +31,17 @@ import com.squareup.picasso.Picasso;
 
 import org.json.JSONException;
 
+import java.io.ByteArrayOutputStream;
+import java.net.URL;
 import java.util.ArrayList;
 
 import michael_juarez.popularmoviesapp.data.FavoriteMoviesContract;
-import michael_juarez.popularmoviesapp.data.FavoriteMoviesDbHelper;
 import michael_juarez.popularmoviesapp.data.Review;
 import michael_juarez.popularmoviesapp.utilities.NetworkUtils;
 import michael_juarez.popularmoviesapp.utilities.OpenMoviesJsonUtils;
 
-import static android.R.attr.data;
-import static android.R.attr.drawable;
+import static android.graphics.BitmapFactory.decodeByteArray;
+import static michael_juarez.popularmoviesapp.R.string.back;
 
 /**
  * Created by Michael Juarez on 7/10/2017.
@@ -68,6 +61,8 @@ public class MovieDetails extends AppCompatActivity implements MovieDetailsAdapt
     private static final int LOADER_MANAGER_TRAILERS = 64;
     private static final int LOADER_MANAGER_REVIEWS = 65;
     private static final int LOADER_FAVORITE_CHECK = 66;
+    private static final int LOADER_IMAGE_DB = 67;
+    private static final int LOADER_INSERT_MOVIES = 68;
 
     private static final String EXTRA_TITLE = "com.michael_juarez.popularmoviesapp.title";
     private static final String EXTRA_POSTER_PATH = "com.michael_juarez.popularmoviesapp.posterPath";
@@ -76,6 +71,7 @@ public class MovieDetails extends AppCompatActivity implements MovieDetailsAdapt
     private static final String EXTRA_RELEASE_DATE = "com.michael_juarez.popularmoviesapp.releaseDate";
     private static final String EXTRA_BACKDROP_PATH = "com.michael_juarez.popularmoviesapp.backdropPath";
     private static final String EXTRA_ID = "com.michael_juarez.popularmoviesapp.id";
+    private static final String EXTRA_FILTER_TYPE = "com.michael_juarez.popularmoviesapp.filterType";
 
 
 
@@ -84,7 +80,7 @@ public class MovieDetails extends AppCompatActivity implements MovieDetailsAdapt
 
     private SQLiteDatabase mDb;
 
-    private ImageView mBackDropPath;
+    private ImageView mBackDropImageView;
     private ImageView mPosterImageView;
     private TextView mTitle;
     private TextView mOverview;
@@ -104,8 +100,12 @@ public class MovieDetails extends AppCompatActivity implements MovieDetailsAdapt
     private String overview;
     private String voteAverage;
     private String releaseDate;
+    private String filterType;
 
-    public static Intent newIntent(Context packageContext, String title, String posterPath, String overview, String voteAverage, String releaseDate, String backdropPath, String id) {
+    private boolean returnIntentBoolean;
+
+    //This Intent is properly formatted for use by other classes to use this class.
+    public static Intent newIntent(Context packageContext, String title, String posterPath, String overview, String voteAverage, String releaseDate, String backdropPath, String id, String filterType) {
         Intent intent = new Intent(packageContext, MovieDetails.class);
         intent.putExtra(EXTRA_TITLE, title);
         intent.putExtra(EXTRA_POSTER_PATH, posterPath);
@@ -114,6 +114,7 @@ public class MovieDetails extends AppCompatActivity implements MovieDetailsAdapt
         intent.putExtra(EXTRA_RELEASE_DATE, releaseDate);
         intent.putExtra(EXTRA_BACKDROP_PATH, backdropPath);
         intent.putExtra(EXTRA_ID, id);
+        intent.putExtra(EXTRA_FILTER_TYPE, filterType);
         return intent;
     }
 
@@ -122,12 +123,8 @@ public class MovieDetails extends AppCompatActivity implements MovieDetailsAdapt
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_movie_details);
 
-        //Establish DB access
-        FavoriteMoviesDbHelper dbHelper = new FavoriteMoviesDbHelper(this);
-        mDb = dbHelper.getWritableDatabase();
-
         //Find and assign Views and Widgets to member variables
-        mBackDropPath = (ImageView) findViewById(R.id.movie_details_backdrop);
+        mBackDropImageView = (ImageView) findViewById(R.id.movie_details_backdrop);
         mPosterImageView = (ImageView) findViewById(R.id.movie_details_poster);
         mTitle = (TextView) findViewById(R.id.movie_details_title);
         mOverview = (TextView) findViewById(R.id.movie_details_overview);
@@ -147,11 +144,21 @@ public class MovieDetails extends AppCompatActivity implements MovieDetailsAdapt
         overview = (String) getIntent().getSerializableExtra(EXTRA_OVERVIEW);
         voteAverage = (String) getIntent().getSerializableExtra(EXTRA_VOTE_AVERAGE);
         releaseDate = (String) getIntent().getSerializableExtra(EXTRA_RELEASE_DATE);
+        filterType = getIntent().getStringExtra(EXTRA_FILTER_TYPE);
+
+        //If this is not a favorite, then fill ImageView with Picasso
+        //Else use images from DB
+        if (!filterType.equals(NetworkUtils.TYPE_FAVORITE_MOVIES)) {
+            Picasso.with(this).load(backDropURL).into(mBackDropImageView);
+            Picasso.with(this).load(posterURL).into(mPosterImageView);
+        }
+        else {
+            setupImageLoadFromDb();
+        }
 
         //Load widgets and views with variables from intent
-        Picasso.with(this).load(backDropURL).into(mBackDropPath);
         mTitle.setText(title);
-        Picasso.with(this).load(posterURL).into(mPosterImageView);
+
         mOverview.setText(overview);
         mVoteAverage.setText(voteAverage);
         mReleaseDate.setText(releaseDate);
@@ -190,6 +197,81 @@ public class MovieDetails extends AppCompatActivity implements MovieDetailsAdapt
         else
             loaderManager.restartLoader(LOADER_MANAGER_REVIEWS,args,trailersAndReviewsLoader);
     }
+
+    //This class is only called when the Filter Type is equal to Favorite Movies
+    private void setupImageLoadFromDb() {
+        Bundle args = new Bundle();
+        LoaderManager loaderManager = getSupportLoaderManager();
+        Loader<ArrayList> imageDBLader = loaderManager.getLoader(LOADER_IMAGE_DB);
+
+        if (imageDBLader == null)
+            loaderManager.initLoader(LOADER_IMAGE_DB,args,loaderImagesFromDb);
+        else
+            loaderManager.restartLoader(LOADER_IMAGE_DB,args,loaderImagesFromDb);
+    }
+
+    /*
+      This background thread is used to load the images from the Database
+      This Loader is only called when the Filter Type is equal to Favorite Movies
+    */
+    private LoaderManager.LoaderCallbacks<ArrayList<byte[]>> loaderImagesFromDb = new LoaderManager.LoaderCallbacks<ArrayList<byte[]>>() {
+
+        @Override
+        public Loader<ArrayList<byte[]>> onCreateLoader(int id, final Bundle args)  {
+            return new AsyncTaskLoader<ArrayList<byte[]>>(getBaseContext()) {
+
+                @Override
+                protected void onStartLoading() {
+                    super.onStartLoading();
+                    forceLoad();
+                }
+
+                @Override
+                public ArrayList<byte[]> loadInBackground() {
+                    try {
+                        Cursor cursor = getContentResolver().query(FavoriteMoviesContract.FavoriteMovies.CONTENT_URI,
+                                null,
+                                FavoriteMoviesContract.FavoriteMovies.COLUMN_MOVIE_ID + "=?",
+                                new String[]{mId},
+                                null,
+                                null);
+                        if (cursor.moveToFirst()){
+                            byte[] posterByte = cursor.getBlob(cursor.getColumnIndex(FavoriteMoviesContract.FavoriteMovies.COLUMN_MOVIE_POSTER_BLOB));
+                            byte[] backDropByte = cursor.getBlob(cursor.getColumnIndex(FavoriteMoviesContract.FavoriteMovies.COLUMN_MOVIE_BACKDROP_BLOB));
+                            cursor.close();
+                            ArrayList<byte[]> returnList = new ArrayList<byte[]>();
+                            returnList.add(posterByte);
+                            returnList.add(backDropByte);
+                            return returnList;
+                        }
+                        else {
+                            cursor.close();
+                            return null;
+                        }
+                    } catch (Exception e) {
+                        Log.e(TAG, "Failed to asynchronously load data.");
+                        e.printStackTrace();
+                        return null;
+                    }
+                }
+            };
+        }
+
+        @Override
+        public void onLoadFinished(Loader<ArrayList<byte[]>> loader, ArrayList<byte[]> data) {
+            byte[] posterByte = data.get(0);
+            byte[] backDropByte = data.get(1);
+
+            mPosterImageView.setImageBitmap(BitmapFactory.decodeByteArray(posterByte, 0, posterByte.length));
+            mBackDropImageView.setImageBitmap(BitmapFactory.decodeByteArray(backDropByte, 0, backDropByte.length));
+            getSupportLoaderManager().destroyLoader(loader.getId());
+        }
+
+        @Override
+        public void onLoaderReset(Loader<ArrayList<byte[]>> loader) {
+
+        }
+    };
 
     //This background thread can handle retrieving Movie Trailers and Reviews
     private LoaderManager.LoaderCallbacks<ArrayList> trailersAndReviewsLoader = new LoaderManager.LoaderCallbacks<ArrayList>() {
@@ -253,6 +335,7 @@ public class MovieDetails extends AppCompatActivity implements MovieDetailsAdapt
         @Override
         public void onLoadFinished(Loader<ArrayList> loader, ArrayList data) {
                 trailerloaderHelper(data, loader.getId());
+            getSupportLoaderManager().destroyLoader(loader.getId());
         }
 
         @Override
@@ -273,7 +356,6 @@ public class MovieDetails extends AppCompatActivity implements MovieDetailsAdapt
         else if (id == LOADER_MANAGER_REVIEWS){
             mReviews.setText(Html.fromHtml((String)data.get(0)));
         }
-
     }
 
     @Override
@@ -291,8 +373,6 @@ public class MovieDetails extends AppCompatActivity implements MovieDetailsAdapt
         }
     }
 
-
-
     @Override
     public boolean onCreateOptionsMenu(final Menu menu) {
         /* Use AppCompatActivity's method getMenuInflater to get a handle on the menu inflater */
@@ -305,7 +385,7 @@ public class MovieDetails extends AppCompatActivity implements MovieDetailsAdapt
 
         if (actionBar != null){
             actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setTitle(R.string.back);
+            actionBar.setTitle(back);
         }
 
         //Check if movie is saved already
@@ -354,6 +434,7 @@ public class MovieDetails extends AppCompatActivity implements MovieDetailsAdapt
                     MenuItem item = menu.getItem(0).setIcon(R.drawable.ic_star_checked);
                     item.setChecked(true);
                 }
+                getSupportLoaderManager().destroyLoader(loader.getId());
             }
 
             @Override
@@ -369,17 +450,14 @@ public class MovieDetails extends AppCompatActivity implements MovieDetailsAdapt
             loaderManager.initLoader(LOADER_FAVORITE_CHECK,null,queryLoader);
         else
             loaderManager.restartLoader(LOADER_FAVORITE_CHECK,null,queryLoader);
-
         return true;
     }
-
-
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                super.onBackPressed();
+                onBackPressed();
                 return true;
             case R.id.menu_favorite : {
                 if (!item.isChecked()){
@@ -398,28 +476,101 @@ public class MovieDetails extends AppCompatActivity implements MovieDetailsAdapt
         return super.onOptionsItemSelected(item);
     }
 
-
     private void insertFavoriteMovie() {
-        ContentValues cv = new ContentValues();
-        cv.put(FavoriteMoviesContract.FavoriteMovies.COLUMN_MOVIE_ID, mId);
-        cv.put(FavoriteMoviesContract.FavoriteMovies.COLUMN_MOVIE_TITLE, title);
-        cv.put(FavoriteMoviesContract.FavoriteMovies.COLUMN_MOVIE_POSTER_URL, posterPath);
-        cv.put(FavoriteMoviesContract.FavoriteMovies.COLUMN_MOVIE_BACKDROP_URL, backDropURL);
-        cv.put(FavoriteMoviesContract.FavoriteMovies.COLUMN_MOVIE_RELEASE_DATE, releaseDate);
-        cv.put(FavoriteMoviesContract.FavoriteMovies.COLUMN_MOVIE_SYNOPSIS, overview);
-        cv.put(FavoriteMoviesContract.FavoriteMovies.COLUMN_MOVIE_USER_RATING, voteAverage);
 
-        Uri uri = getContentResolver().insert(FavoriteMoviesContract.FavoriteMovies.CONTENT_URI,cv);
-        if (uri != null)
-            Toast.makeText(getBaseContext(), "" + title + " " + getResources().getString(R.string.added_sucessfully), Toast.LENGTH_LONG).show();
+        LoaderManager.LoaderCallbacks<ContentValues> insertFavoriteLoader = new LoaderManager.LoaderCallbacks<ContentValues>() {
+
+            @Override
+            public Loader<ContentValues> onCreateLoader(int id, final Bundle args)  {
+                return new AsyncTaskLoader<ContentValues>(getBaseContext()) {
+
+                    @Override
+                    protected void onStartLoading() {
+                        super.onStartLoading();
+                        forceLoad();
+                    }
+
+                    @Override
+                    public ContentValues loadInBackground() {
+                        ContentValues cv = new ContentValues();
+                        cv.put(FavoriteMoviesContract.FavoriteMovies.COLUMN_MOVIE_ID, mId);
+                        cv.put(FavoriteMoviesContract.FavoriteMovies.COLUMN_MOVIE_TITLE, title);
+                        cv.put(FavoriteMoviesContract.FavoriteMovies.COLUMN_MOVIE_RELEASE_DATE, releaseDate);
+                        cv.put(FavoriteMoviesContract.FavoriteMovies.COLUMN_MOVIE_SYNOPSIS, overview);
+                        cv.put(FavoriteMoviesContract.FavoriteMovies.COLUMN_MOVIE_USER_RATING, voteAverage);
+                        cv.put(FavoriteMoviesContract.FavoriteMovies.COLUMN_MOVIE_POSTER_URL, posterPath);
+                        cv.put(FavoriteMoviesContract.FavoriteMovies.COLUMN_MOVIE_BACKDROP_URL, backDropPath);
+
+                        byte[] posterPathByte = getBitmapAsByteArray(getBitmapFromUrl(posterURL));
+                        byte[] backDropURLByte = getBitmapAsByteArray(getBitmapFromUrl(backDropURL));
+                        cv.put(FavoriteMoviesContract.FavoriteMovies.COLUMN_MOVIE_POSTER_BLOB, posterPathByte);
+                        cv.put(FavoriteMoviesContract.FavoriteMovies.COLUMN_MOVIE_BACKDROP_BLOB, backDropURLByte);
+
+                        return cv;
+                    }
+
+                    private Bitmap getBitmapFromUrl(String src) {
+                        try {
+                            URL url = new URL(src);
+                            /*HttpURLConnection connection = (HttpURLConnection) url.openConnection();
+                            connection.setDoInput(true);
+                            connection.connect();
+                            InputStream input = connection.getInputStream();*/
+                            Bitmap myBitmap = BitmapFactory.decodeStream(url.openConnection().getInputStream());
+                            return myBitmap;
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            return null;
+                        }
+                    }
+                    private byte[] getBitmapAsByteArray(Bitmap bitmap) {
+                        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, outputStream);
+                        return outputStream.toByteArray();
+                    }
+                };
+            }
+
+            @Override
+            public void onLoadFinished(Loader<ContentValues> loader, ContentValues cv) {
+                Uri uri = getContentResolver().insert(FavoriteMoviesContract.FavoriteMovies.CONTENT_URI,cv);
+                if (uri != null)
+                    Toast.makeText(getBaseContext(), "" + title + " " + getResources().getString(R.string.added_sucessfully), Toast.LENGTH_LONG).show();
+                getSupportLoaderManager().destroyLoader(loader.getId());
+            }
+
+            @Override
+            public void onLoaderReset(Loader<ContentValues> loader) {
+
+            }
+        };
+        Bundle args = new Bundle();
+        LoaderManager loaderManager = getSupportLoaderManager();
+        Loader<ArrayList> imageDBLader = loaderManager.getLoader(LOADER_INSERT_MOVIES);
+
+        if (imageDBLader == null)
+            loaderManager.initLoader(LOADER_INSERT_MOVIES,args,insertFavoriteLoader);
+        else
+            loaderManager.restartLoader(LOADER_INSERT_MOVIES,args,insertFavoriteLoader);
+
     }
 
     private void removeFavoriteMovie() {
-        //mDb.delete(FavoriteMoviesContract.FavoriteMovies.TABLE_NAME, FavoriteMoviesContract.FavoriteMovies.COLUMN_MOVIE_ID + "=" + mId, null);
         Uri uri = FavoriteMoviesContract.FavoriteMovies.CONTENT_URI;
         uri = uri.buildUpon().appendPath(mId).build();
         int deleteMovie = getContentResolver().delete(uri,FavoriteMoviesContract.FavoriteMovies.COLUMN_MOVIE_ID,null);
-        if (deleteMovie != 0)
+        if (deleteMovie != 0) {
             Toast.makeText(this, "" + title + " " + getResources().getString(R.string.removed_successfully), Toast.LENGTH_LONG).show();
+            returnIntentBoolean = true;
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        Intent returnIntent = new Intent();
+        returnIntent.putExtra("dropped", returnIntentBoolean);
+        setResult(RESULT_OK, returnIntent);
+        finish();
+        super.onBackPressed();
     }
 }

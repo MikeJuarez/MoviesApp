@@ -18,6 +18,7 @@ public class Movie {
     String mRelease_date;
     String mPageNumber;
     String mVoteAverage;
+    String mBackDrop_path;
 
     public String getBackDrop_path() {
         return mBackDrop_path;
@@ -26,8 +27,6 @@ public class Movie {
     public void setBackDrop_path(String backDrop_path) {
         mBackDrop_path = backDrop_path;
     }
-
-    String mBackDrop_path;
 
     public Movie(String id, String poster_path, String title, String overview, String release_date, String pageNumber, String backDrop_path, String voteAverage) {
         mId = id;

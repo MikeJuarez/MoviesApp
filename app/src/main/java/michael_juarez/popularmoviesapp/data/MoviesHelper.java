@@ -7,6 +7,8 @@ import java.util.List;
 
 /**
  * Created by Michael Juarez on 7/10/2017.
+ * This class uses a Singleton to help keep track and update of the movie list
+ * that the RecyclerViews will use at their data source.
  */
 
 public class MoviesHelper {
@@ -14,7 +16,7 @@ public class MoviesHelper {
     private static MoviesHelper sMoviesHelper;
     private List<Movie> mMovieList;
 
-
+    //Singleton pattern
     public static MoviesHelper get(Context context) {
         if (sMoviesHelper == null)
             return new MoviesHelper(context);
@@ -22,7 +24,7 @@ public class MoviesHelper {
     }
 
     private MoviesHelper(Context context) {
-        mMovieList = new ArrayList<Movie>();
+        mMovieList = new ArrayList();
     }
 
     public List<Movie> getMovieList() {
